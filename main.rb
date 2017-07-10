@@ -1,70 +1,55 @@
-require "twitter"
-require 'open-uri'
+#!/usr/bin/ruby
 # encoding: utf-8
+require "twitter"
+require "./init.rb"
+require 'open-uri'
+require "./function.rb"
 
-USERNAME = "fustuu_no_ladio"
-$twh = ""
-
+# twitterID
+USERNAME = $name
+# tweetの内容
+$tw_str = ""
+# twitterの初期設定
 $client = Twitter::REST::Client.new do |config|
-  config.consumer_key        = ""
-  config.consumer_secret     = ""
-  config.access_token        = ""
-  config.access_token_secret = ""
+  config.consumer_key        = $c_k
+  config.consumer_secret     = $c_s
+  config.access_token        = $a_t
+  config.access_token_secret = $a_t_s
 end
 
-
+# 重複ツイートはしないでツイートする
 def tweeet (str)
-  if $twh != str
-  # p "tweet する"
-    $twh = str
-$client.update(str)
-  else
-#p "tweetしない"
+  unless $tw_str == str then
+    $tw_str = str
+    #$client.update(str)
+    p str
   end
-
 end
 
-def get_ladio_list
-  open('http://yp.ladio.net/stats/list.v2.dat', 'r:CP932'){|l|
-    status = false
-    count = 0
-    ii = {}
-    l.read.split("\n\n").each {|i|
-      item = i.encode!("UTF-8")
-      if item.include?("普通にねとらじリレー") then
-        count = count + 1
-        status = true
-        item = item.split("\n")
-        item.each{|e|
-          es = e.split("=",2)
-          ii[es[0]] = es[1]
-        }
-      end
-    }
-     if status then
-    # p count
-      if count == 1 then ##ふつらじ放送中
-      tweeet(ii["NAM"] + " " + ii["SURL"])
-      sleep(10)
-      get_ladio_list
-      elsif count == 2 then ##（バトン渡し中）
-      tweeet("バトンが繋がりそう")
-      sleep(10)
-      get_ladio_list
-      else
-      tweeet("3人以上がリレーしている？？")
-      sleep(10)
-      get_ladio_list
-      end
-
-    else
-      tweeet("ふつらじリレーが終わりました。")
-      sleep(10)
-    end
-  }
-end
+b_list =  list_filter
 
 loop do
-get_ladio_list
-sleep(30)
+sleep(10)
+
+a_list =  list_filter
+henka = a_list.size - b_list.size
+
+if henka == 0 #変化なし
+  if $tw_str == ""
+    tweeet(a_list[0]["NAM"] + " " +  a_list[0]["SURL"])
+  end
+  if a_list.size == 0
+  tweeet( "まだみぬDJさんバトンはホカホカですよ！" )
+  end
+elsif henka == 1 or henka == -1 
+  if a_list.size == 1 or henka == -1
+    tweeet(a_list[0]["NAM"] + " " +  a_list[0]["SURL"] )
+  elsif a_list.size == 2 
+    tweeet("バトンが繋がりそうな気配がする。。。！" + a_list[1]["SURL"])
+  end
+else 
+  tweeet("3人以上がリレーに参加している！？！？想定外の事態です！" + a_list[2]["SURL"])
 end
+b_list = a_list
+end
+
