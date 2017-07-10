@@ -24,10 +24,11 @@ def get_ladio_list
 end
 
 def save_status
-  list = get_ladio_list
-#  list = list_filter
+  list = list_filter
   str = JSON.generate( list )
-  return str
+  File.open("futuraji.json", "w") do |f| 
+      f.puts(str)
+  end
 end
 
 def list_filter
