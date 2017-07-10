@@ -21,9 +21,9 @@ end
 def tweeet (str)
   unless $tw_str == str then
     $tw_str = str
-    #$client.update(str)
-    p str
+    $client.update(str)
   end
+  p str
 end
 
 b_list =  list_filter
@@ -35,17 +35,16 @@ a_list =  list_filter
 henka = a_list.size - b_list.size
 
 if henka == 0 #変化なし
-  if $tw_str == ""
+  if $tw_str == "" &&  a_list.size == 1
     tweeet(a_list[0]["NAM"] + " " +  a_list[0]["SURL"])
   end
-  if a_list.size == 0
-  tweeet( "まだみぬDJさんバトンはホカホカですよ！" )
-  end
 elsif henka == 1 or henka == -1 
-  if a_list.size == 1 or henka == -1
+  if a_list.size == 1 
     tweeet(a_list[0]["NAM"] + " " +  a_list[0]["SURL"] )
   elsif a_list.size == 2 
     tweeet("バトンが繋がりそうな気配がする。。。！" + a_list[1]["SURL"])
+  elsif a_list.size == 0
+  tweeet(b_list[0]["DJ"] + "さんがリレーのアンカーでした！お疲れ様でした！まだみぬDJさんバトンはホカホカですよ！" + b_list[0]["SURL"] )
   end
 else 
   tweeet("3人以上がリレーに参加している！？！？想定外の事態です！" + a_list[2]["SURL"])

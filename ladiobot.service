@@ -5,6 +5,7 @@ Description = ladiobot daemon
 ExecStart = /usr/bin/ruby /opt/futuladio/main.rb
 Restart = always
 Type = simple
+WorkingDirectory=/opt/futuladio
 
 [Install]
 WantedBy = multi-user.target
