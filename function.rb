@@ -18,17 +18,20 @@ def get_ladio_list
     }
   }
   ret.sort! do |a, b|
-      a["TIMS"] <=> b["TIMS"]
+    a["TIMS"] <=> b["TIMS"]
   end
   return ret
 end
 
-def save_status
-  list = list_filter
-  str = JSON.generate( list )
-  File.open("futuraji.json", "w") do |f| 
+def save_status(i)
+  if i.length == 1  then
+    l = i[0]
+    url = "http://" + l["SRV"].to_s + ":" + l["PRT"].to_s + l["MNT"].to_s 
+    str = '<audio src = ' + url + ' autoplay controls>'
+    File.open("./web/live/audio_html", "w") do |f|
       f.puts(str)
-  end
+    end
+  end 
 end
 
 def list_filter
@@ -39,4 +42,7 @@ def list_filter
   }
   return ret
 end
+
+list = list_filter
+save_status(list)
 
